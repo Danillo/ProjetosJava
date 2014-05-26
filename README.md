@@ -1,7 +1,5 @@
 ProjetosJava
 ============
-
-Meus projetos Java do curso Análise e Desenvolvimento de Sistemas - PUC GO.
 Tecnologias Utilizadas:
 
   Front-End
@@ -14,8 +12,8 @@ Tecnologias Utilizadas:
   - JQuery.
   
 
-
   Back-End
+  - Maven
   - SPRING MVC;
   - Hibernate;
   - HSQLDB;

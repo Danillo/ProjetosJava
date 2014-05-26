@@ -1,0 +1,109 @@
+package br.pucgoias.fichaverificacao.negocio;
+
+import java.util.List;
+
+import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import br.pucgoias.agenda.entidade.Pessoa;
+import br.pucgoias.agenda.entidade.Telefone;
+import br.pucgoias.agenda.persistencia.PessoaDAO;
+import br.pucgoias.agenda.persistencia.TelefoneDAO;
+import br.pucgoias.fichaverificacao.entidade.FichaVerificacao;
+import br.pucgoias.fichaverificacao.persistencia.FichaVerificacaoDAO;
+import br.pucgoias.util.AgendaException;
+import br.pucgoias.util.FichaVerificacaoException;
+
+/**
+ * Classe que define as operacoes da camada de negocio de Ficha de Verificação
+ * @author Danillo
+ *
+ */
+@Service
+@Transactional
+public class FichaVerificacaoImpl implements FichaVerificacaoService {
+
+	//Interface da persistencia
+	private FichaVerificacaoDAO fichaVerificacaoDAO;
+	
+	
+	public FichaVerificacaoDAO getFichaVerificacaoDAO() {
+		return fichaVerificacaoDAO;
+	}
+
+	@Autowired
+	public void setFichaVerificacaoDAO(FichaVerificacaoDAO fichaVerificacaoDAO) {
+		this.fichaVerificacaoDAO = fichaVerificacaoDAO;
+	}
+
+	/**
+	 * Inclui uma Ficha
+	 * @param fichaVerificacao
+	 * @return
+	 * @throws FichaVerificacaoException
+	 */
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED, rollbackFor=Exception.class)
+	public FichaVerificacao incluir(FichaVerificacao fichaVerificacao) throws FichaVerificacaoException
+	{
+		return getFichaVerificacaoDAO().incluir(fichaVerificacao);
+	}
+
+	/**
+	 * Altera uma pessoa
+	 * @param fichaVerificacao
+	 * @return
+	 * @throws FichaVerificacaoException
+	 */
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED, rollbackFor=Exception.class)
+	public FichaVerificacao alterar(FichaVerificacao fichaVerificacao) throws FichaVerificacaoException {
+		
+		//exclui os itens da base que foram removidos da tela
+		FichaVerificacao fichaVerificacaoExistente = this.consultar(fichaVerificacao.getIdFichaVerificacao());
+		
+		return getFichaVerificacaoDAO().alterar(fichaVerificacao);
+	}
+
+	/**
+	 * Exclui uma pessoa
+	 * @param pessoa
+	 * @throws AgendaException
+	 */
+	@Transactional(readOnly=false, propagation = Propagation.REQUIRED, rollbackFor=Exception.class)
+	public void excluir(Integer id) throws AgendaException {
+		
+		//exclui todos os itens antes de excluir a pessoa
+		Pessoa pessoaExistente = this.consultar(id);
+		for (Telefone telefone : pessoaExistente.getListaTelefone()) {
+			getTelefoneDAO().excluir(telefone.getIdTelefone());
+		}
+
+		getPessoaDAO().excluir(id);
+	}
+
+	/**
+	 * Consulta uma pessoa pelo identificador
+	 * @param id
+	 * @return
+	 * @throws AgendaException
+	 */
+	@Transactional(readOnly=true, propagation = Propagation.SUPPORTS)
+	public Pessoa consultar(Integer id) throws AgendaException {
+		Pessoa pessoa = getPessoaDAO().consultar(id);
+		//Inicializa a lista de telefones
+		Hibernate.initialize(pessoa.getListaTelefone());
+		return pessoa;
+	}
+
+	/**
+	 * Lista todas as pessoas cadastradas
+	 * @return
+	 * @throws AgendaException
+	 */
+	@Transactional(readOnly=true, propagation = Propagation.SUPPORTS)
+	public List<Pessoa> listar() throws AgendaException {
+		return getPessoaDAO().listar();
+	}
+}

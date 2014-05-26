@@ -1,0 +1,44 @@
+package br.pucgoias.fichaverificacao.controle;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
+
+import org.springframework.stereotype.Component;
+
+/**
+ * Classe que representa o formulario web de Pessoa
+ * @author Danillo
+ *
+ */
+@Component
+@ManagedBean
+@SessionScoped
+public class FichaVerificacaoBean {
+	
+	private Integer idPessoa;
+	private String dsNome;
+	private Integer vlIdade;
+	
+	public Integer getIdPessoa() {
+		return idPessoa;
+	}
+	public void setIdPessoa(Integer idPessoa) {
+		this.idPessoa = idPessoa;
+	}
+	public String getDsNome() {
+		return dsNome;
+	}
+	public void setDsNome(String dsNome) {
+		this.dsNome = dsNome;
+	}
+	public void setVlIdade(Integer vlIdade) {
+		this.vlIdade = vlIdade;
+	}
+	public Integer getVlIdade() {
+		return vlIdade;
+	}
+	
+}
+
+
+

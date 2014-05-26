@@ -1,0 +1,14 @@
+package br.pucgoias.fichaverificacao.persistencia;
+
+import br.pucgoias.fichaverificacao.entidade.FichaVerificacao;
+
+/**
+ * Interface que define as operacoes da camada de persistencia de Pessoa
+ * 
+ * @author Gilcimar
+ * 
+ */
+public interface FichaVerificacaoDAO extends GenericoDAO<FichaVerificacao, Integer>
+{
+
+}

@@ -1,0 +1,4 @@
+
+mai 25, 2014 18:39:49.07 NEW SESSION
+mai 25, 2014 18:39:49.07 NOTE: child process received `Goodbye', closing down
+mai 25, 2014 18:39:49.08 [4200] WARNING: pipe error: 109: file c:/builds/moz2_slave/rel-m-rel-w32_bld-000000000000/build/ipc/chromium/src/chrome/common/ipc_channel_win.cc, line 310

@@ -1,0 +1,368 @@
+package br.pucgoias.fichaverificacao.controle;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.RequestScoped;
+import javax.faces.component.html.HtmlInputHidden;
+import javax.faces.context.FacesContext;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+
+import br.pucgoias.fichaverificacao.entidade.FichaVerificacao;
+import br.pucgoias.fichaverificacao.negocio.FichaVerificacaoService;
+import br.pucgoias.util.FichaVerificacaoException;
+
+/**
+ * Classe que controla as requisicoes do cliente web
+ * 
+ * @author Danillo
+ * 
+ */
+@ManagedBean(name = "pessoaController")
+@RequestScoped
+@Controller
+public class FichaVerificacaoController
+{
+
+	@Autowired
+	private FichaVerificacaoBean fichaVerificacaoBean;
+	@Autowired
+	private List<FichaVerificacaoBean> listaFichaVerificacaoBean;
+	@Autowired
+	private FichaVerificacaoService fichaVerificacaoService;
+
+	/**
+	 * Inclui uma fichaverificacao na base de dados
+	 * 
+	 * @return
+	 */
+	public String incluir()
+	{
+		try
+		{
+
+			FichaVerificacao fichaVerificacao = new FichaVerificacao();
+
+			// preenche os dados da tela no objeto persistente
+			
+			fichaVerificacao.setIdFichaVerificacao(fichaVerificacaoBean.getIdFichaVerificacao());
+			fichaVerificacao.setConformidade(fichaVerificacaoBean.getConformidade());
+			fichaVerificacao.setData(fichaVerificacaoBean.getData());
+			fichaVerificacao.setLocal(fichaVerificacaoBean.getLocal());
+			fichaVerificacao.setServico(fichaVerificacaoBean.getServico());
+			fichaVerificacao.setTipolocal(fichaVerificacaoBean.getTipolocal());
+			fichaVerificacao.setValorservico(fichaVerificacaoBean.getValorservico());		
+			
+			getFichaVerificacaoService().incluir(fichaVerificacao);
+
+			return "sucesso";
+		}
+		catch (Exception e)
+		{
+			String msg = "Inclusão não realizada. Motivo: "
+					+ ((e instanceof FichaVerificacaoException ? ((FichaVerificacaoException) e)
+							.getEx().getMessage() : ""));
+			FacesMessage message = new FacesMessage(msg);
+			this.getFacesContext().addMessage("formulario", message);
+			return "falha";
+		}
+	}
+
+	/**
+	 * Lista as pessoas cadastradas
+	 * 
+	 * @return
+	 */
+	public String listar()
+	{
+		try
+		{
+
+			List<FichaVerificacao> listaFichaVerificacao = getFichaVerificacaoService().listar();
+
+			if (listaFichaVerificacao == null || listaFichaVerificacao.size() == 0)
+			{
+				FacesMessage message = new FacesMessage(
+						"Nenhum registro encontrado.");
+				this.getFacesContext().addMessage("formulario", message);
+				return "listar";
+			}
+
+			// Preeche a lista de Fichas da tela
+			listaFichaVerificacaoBean = new ArrayList<FichaVerificacaoBean>();
+			for (FichaVerificacao fichaVerificacao : listaFichaVerificacao)
+			{
+				FichaVerificacaoBean fichaVerificacaoBean = new FichaVerificacaoBean();
+				
+				fichaVerificacaoBean.setIdFichaVerificacao(fichaVerificacao.getIdFichaVerificacao());
+				fichaVerificacaoBean.setConformidade(fichaVerificacao.getConformidade());
+				fichaVerificacaoBean.setData(fichaVerificacao.getData());
+				fichaVerificacaoBean.setLocal(fichaVerificacao.getLocal());
+				fichaVerificacaoBean.setServico(fichaVerificacao.getServico());
+				fichaVerificacaoBean.setTipolocal(fichaVerificacao.getTipolocal());
+				fichaVerificacaoBean.setValorservico(fichaVerificacao.getValorservico());	
+				
+				listaFichaVerificacaoBean.add(fichaVerificacaoBean);
+				
+			}
+
+			return "listar";
+		}
+		catch (Exception e)
+		{
+			String msg = "Listagem não realizada. Motivo: "
+					+ ((e instanceof FichaVerificacaoException ? ((FichaVerificacaoException) e)
+							.getEx().getMessage() : ""));
+			FacesMessage message = new FacesMessage(msg);
+			this.getFacesContext().addMessage("formulario", message);
+			return "falha";
+		}
+	}
+
+	/**
+	 * Consulta uma Ficha cadastrada
+	 * 
+	 * @return
+	 */
+	public String consultar()
+	{
+		try
+		{
+			HtmlInputHidden idFichaVerificacao = (HtmlInputHidden) this.getFacesContext()
+					.getViewRoot().findComponent("formulario:idFichaVerificacao");
+
+			FichaVerificacao fichaVerificacao = getFichaVerificacaoService().consultar(
+					(Integer) idFichaVerificacao.getValue());
+
+			if (fichaVerificacao == null || fichaVerificacao.getIdFichaVerificacao() == null)
+			{
+				FacesMessage message = new FacesMessage(
+						"Nenhum registro encontrado.");
+				this.getFacesContext().addMessage("formulario", message);
+				return "listar";
+			}
+
+			// preenche os dados do bean da tela
+			
+			fichaVerificacaoBean.setIdFichaVerificacao(fichaVerificacao.getIdFichaVerificacao());
+			fichaVerificacaoBean.setConformidade(fichaVerificacao.getConformidade());
+			fichaVerificacaoBean.setData(fichaVerificacao.getData());
+			fichaVerificacaoBean.setLocal(fichaVerificacao.getLocal());
+			fichaVerificacaoBean.setServico(fichaVerificacao.getServico());
+			fichaVerificacaoBean.setTipolocal(fichaVerificacao.getTipolocal());
+			fichaVerificacaoBean.setValorservico(fichaVerificacao.getValorservico());	
+
+			return "editar";
+		}
+		catch (Exception e)
+		{
+			String msg = "Consulta não realizada. Motivo: "
+					+ ((e instanceof FichaVerificacaoException ? ((FichaVerificacaoException) e)
+							.getEx().getMessage() : ""));
+			FacesMessage message = new FacesMessage(msg);
+			this.getFacesContext().addMessage("formulario", message);
+			return "falha";
+		}
+	}
+
+	/**
+	 * Cria uma nova pessoa
+	 * 
+	 * @return
+	 */
+	public String criar()
+	{
+		try
+		{
+
+			fichaVerificacaoBean = new FichaVerificacaoBean();
+
+			return "criar";
+		}
+		catch (Exception e)
+		{
+			String msg = "Criação não realizada. Motivo: "
+					+ ((e instanceof FichaVerificacaoException ? ((FichaVerificacaoException) e)
+							.getEx().getMessage() : ""));
+			FacesMessage message = new FacesMessage(msg);
+			this.getFacesContext().addMessage("formulario", message);
+			return "falha";
+		}
+	}
+
+	/**
+	 * Adiciona um telefone de uma pessoa
+	 * 
+	 * @return
+	 */
+	public String adicionar()
+	{
+		try
+		{
+
+			TelefoneBean novo = new TelefoneBean();
+			novo.setClTipo(telefoneBean.getClTipo());
+			novo.setDsNumero(telefoneBean.getDsNumero());
+
+			pessoaBean.getListaTelefone().add(novo);
+
+			telefoneBean = new TelefoneBean();
+
+			this.setSession("telefones", pessoaBean.getListaTelefone());
+
+			return "criar";
+		}
+		catch (Exception e)
+		{
+			FacesMessage message = new FacesMessage(
+					"Criação não realizada. Movito: " + e.getMessage());
+			this.getFacesContext().addMessage("formulario", message);
+			return "falha";
+		}
+	}
+
+	/**
+	 * Exclui uma Ficha cadastrada
+	 * 
+	 * @return
+	 */
+	public String excluir()
+	{
+		try
+		{
+
+			HtmlInputHidden idFichaVerificacao = (HtmlInputHidden) this.getFacesContext()
+					.getViewRoot().findComponent("formulario:idFichaVerificacao");
+
+			FichaVerificacao fichaVerificacao = getFichaVerificacaoService().consultar(
+					(Integer) idFichaVerificacao.getValue());
+
+			if (fichaVerificacao == null || fichaVerificacao.getIdFichaVerificacao() == null)
+			{
+				FacesMessage message = new FacesMessage(
+						"Nenhum registro encontrado.");
+				this.getFacesContext().addMessage("formulario", message);
+				return "listar";
+			}
+
+			getFichaVerificacaoService().excluir(fichaVerificacao.getIdFichaVerificacao());
+
+			return "sucesso";
+		}
+		catch (Exception e)
+		{
+			String msg = "Exclusão não realizada. Motivo: "
+					+ ((e instanceof FichaVerificacaoException ? ((FichaVerificacaoException) e)
+							.getEx().getMessage() : ""));
+			FacesMessage message = new FacesMessage(msg);
+			this.getFacesContext().addMessage("formulario", message);
+			return "falha";
+		}
+	}
+
+	/**
+	 * Altera uma Ficha cadastrada
+	 * 
+	 * @return
+	 */
+	public String alterar()
+	{
+		try
+		{
+
+			FichaVerificacao = getFichaVerificacaoService().consultar(
+					fichaVerificacaoBean.getIdFichaVerificacao());
+
+			if (fichaVerificacao == null || fichaVerificacao.getIdPessoa() == null)
+			{
+				FacesMessage message = new FacesMessage(
+						"Nenhum registro encontrado.");
+				this.getFacesContext().addMessage("formulario", message);
+				return "listar";
+			}
+
+			// preenche os dados da tela no objeto persistente
+			pessoa.setDsNome(pessoaBean.getDsNome());
+			pessoa.setVlIdade(pessoaBean.getVlIdade().toString());
+
+			// preeche a lista de telefones da tela na lista de telefones
+			// persistente
+			pessoa.setListaTelefone(new ArrayList<Telefone>());
+			for (TelefoneBean telefoneBean : pessoaBean.getListaTelefone())
+			{
+				Telefone telefone = new Telefone();
+				telefone.setIdTelefone(telefoneBean.getIdTelefone() == 0 ? null
+						: telefoneBean.getIdTelefone());
+				telefone.setClTipo(telefoneBean.getClTipo());
+				telefone.setDsNumero(telefoneBean.getDsNumero());
+				telefone.setPessoa(pessoa);
+				pessoa.getListaTelefone().add(telefone);
+			}
+
+			getPessoaService().alterar(pessoa);
+			return "sucesso";
+
+		}
+		catch (Exception e)
+		{
+			String msg = "Alteração não realizada. Movito: "
+					+ ((e instanceof FichaVerificacaoException ? ((FichaVerificacaoException) e)
+							.getEx().getMessage() : ""));
+			FacesMessage message = new FacesMessage(msg);
+			this.getFacesContext().addMessage("formulario", message);
+			return "falha";
+		}
+	}
+
+	public FichaVerificacaoService getFichaVerificacaoService()
+	{
+		return fichaVerificacaoService;
+	}
+
+	public void setPessoaService(FichaVerificacaoService fichaVerificacaoService)
+	{
+		this.fichaVerificacaoService = fichaVerificacaoService;
+	}
+
+	private FacesContext getFacesContext()
+	{
+		return FacesContext.getCurrentInstance();
+	}
+
+	private Object getSession(String variavel)
+	{
+		return this.getFacesContext().getExternalContext().getSessionMap()
+				.get(variavel);
+	}
+
+	private void setSession(String variavel, Object objeto)
+	{
+		this.getFacesContext().getExternalContext().getSessionMap()
+				.put(variavel, objeto);
+	}
+
+	public FichaVerificacaoBean getfichaVerificacaoBean()
+	{
+		return fichaVerificacaoBean;
+	}
+
+	public void setPessoaBean(FichaVerificacaoBean fichaVerificacaoBean)
+	{
+		this.fichaVerificacaoBean = fichaVerificacaoBean;
+	}
+
+	public List<FichaVerificacaoBean> getListaPessoaBean()
+	{
+		return listaFichaVerificacaoBean;
+	}
+
+	public void setListaPessoaBean(List<FichaVerificacaoBean> listaFichaVerificacaoBean)
+	{
+		this.listaFichaVerificacaoBean = listaFichaVerificacaoBean;
+	}
+
+}

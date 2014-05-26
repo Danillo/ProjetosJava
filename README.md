@@ -3,13 +3,13 @@ ProjetosJava
 Tecnologias Utilizadas:
 
   Front-End
+  - JQuery.
   - Bootstrap;
   - JSP;
   - JSF;
   - HTML5;
   - CSS3;
-  - JS;
-  - JQuery.
+  - JS.
   
 
   Back-End
